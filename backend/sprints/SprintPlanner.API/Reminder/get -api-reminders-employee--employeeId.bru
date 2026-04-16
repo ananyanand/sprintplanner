@@ -1,0 +1,43 @@
+meta {
+  name: get /api/reminders/employee/:employeeId
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/reminders/employee/:employeeId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  employeeId: 
+}
+
+example {
+  name: 200 Response
+  description: OK
+  
+  request: {
+    url: {{baseUrl}}/api/reminders/employee/:employeeId
+    method: GET
+    mode: none
+    params:path: {
+      employeeId: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

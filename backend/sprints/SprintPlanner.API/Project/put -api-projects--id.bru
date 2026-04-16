@@ -1,0 +1,61 @@
+meta {
+  name: put /api/projects/:id
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/api/projects/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+body:json {
+  {
+    "name": "",
+    "startDate": "",
+    "endDate": "",
+    "sprintDuration": 0
+  }
+}
+
+example {
+  name: 200 Response
+  description: OK
+  
+  request: {
+    url: {{baseUrl}}/api/projects/:id
+    method: PUT
+    mode: json
+    params:path: {
+      id: 
+    }
+  
+    body:json: {
+      {
+        "name": "",
+        "startDate": "",
+        "endDate": "",
+        "sprintDuration": 0
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

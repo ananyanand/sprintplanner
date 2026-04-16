@@ -1,0 +1,57 @@
+meta {
+  name: put /api/reminders
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/api/reminders
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": 0,
+    "employeeId": 0,
+    "title": "",
+    "dueDate": "",
+    "priority": "",
+    "completed": false
+  }
+}
+
+example {
+  name: 200 Response
+  description: OK
+  
+  request: {
+    url: {{baseUrl}}/api/reminders
+    method: PUT
+    mode: json
+    body:json: {
+      {
+        "id": 0,
+        "employeeId": 0,
+        "title": "",
+        "dueDate": "",
+        "priority": "",
+        "completed": false
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

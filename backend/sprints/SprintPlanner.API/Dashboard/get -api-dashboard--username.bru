@@ -1,0 +1,47 @@
+meta {
+  name: get /api/dashboard/:username
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/dashboard/:username
+  body: none
+  auth: inherit
+}
+
+params:path {
+  username: ananya.t@inhawk.com
+}
+
+vars:pre-request {
+  baseUrl: 
+}
+
+example {
+  name: 200 Response
+  description: OK
+  
+  request: {
+    url: {{baseUrl}}/api/dashboard/:username
+    method: GET
+    mode: none
+    params:path: {
+      username: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

@@ -1,0 +1,49 @@
+## .NET / C# gitignore
+
+# Build outputs
+bin/
+obj/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userprefs
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Test results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Publish output
+publish/
+out/
+
+# Runtime & logs
+*.log
+*.tmp
+
+# Environment / secrets
+appsettings.Development.json
+appsettings.Local.json
+.env
+*.pfx
+*.p12
+
+# macOS
+.DS_Store
+
+# Rider / JetBrains
+*.DotSettings.user

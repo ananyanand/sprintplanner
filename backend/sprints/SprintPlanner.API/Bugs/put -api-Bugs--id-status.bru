@@ -1,0 +1,43 @@
+meta {
+  name: put /api/Bugs/:id/status
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/api/Bugs/:id/status
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+example {
+  name: 200 Response
+  description: OK
+  
+  request: {
+    url: {{baseUrl}}/api/Bugs/:id/status
+    method: PUT
+    mode: json
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "SprintPlanner.API",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

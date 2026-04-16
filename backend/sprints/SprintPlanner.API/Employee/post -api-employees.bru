@@ -1,0 +1,53 @@
+meta {
+  name: post /api/employees
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/employees
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Ananya Anand",
+    "role": "TeamLead",
+    "username": "ananya.t@inhawk.com",
+    "password": "Arch#1413"
+  }
+}
+
+example {
+  name: 200 Response
+  description: OK
+  
+  request: {
+    url: {{baseUrl}}/api/employees
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "name": "",
+        "role": "",
+        "username": "",
+        "password": ""
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

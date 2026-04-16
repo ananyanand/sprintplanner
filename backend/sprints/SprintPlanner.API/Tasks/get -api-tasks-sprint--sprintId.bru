@@ -1,0 +1,43 @@
+meta {
+  name: get /api/tasks/sprint/:sprintId
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/tasks/sprint/:sprintId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  sprintId: 19
+}
+
+example {
+  name: 200 Response
+  description: OK
+  
+  request: {
+    url: {{baseUrl}}/api/tasks/sprint/:sprintId
+    method: GET
+    mode: none
+    params:path: {
+      sprintId: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
