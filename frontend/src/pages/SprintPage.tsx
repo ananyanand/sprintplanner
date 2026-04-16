@@ -11,6 +11,7 @@ import {
   Plus,
   Timer,
   Users,
+
   CheckCircle2,
   Clock,
   Zap,
@@ -176,6 +177,7 @@ export default function SprintPage() {
           endDate: t.endDate, // ✅ KEEP THIS
 
           assignee: t.assigneeName ? [t.assigneeName] : [],
+          sprintId: t.sprintId,
         };
       });
 

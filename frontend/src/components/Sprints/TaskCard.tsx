@@ -81,31 +81,31 @@ export default function TaskCard({
       {/* Accent Line */}
       <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-accent via-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-      {/* Header with Title and Actions */}
+      {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold text-primary line-clamp-2 mb-1">
             {title}
           </h3>
           {description && (
-            <p className="text-xs text-secondary line-clamp-1">{description}</p>
+            <p className="text-xs text-secondary line-clamp-1">
+              {description}
+            </p>
           )}
         </div>
 
-        {/* View & Edit Buttons - Always Visible */}
-        <div className="flex gap-1 flex-shrink-0" ref={dropdownRef}>
+        {/* View & Edit */}
+        <div className="flex gap-1 flex-shrink-0">
           <button
             onClick={() => onView(id)}
-            title="View task"
-            className="p-2 hover:bg-blue-50 rounded-md transition-colors text-blue-600 hover:text-blue-700"
+            className="p-2 hover:bg-blue-50 rounded-md text-blue-600"
           >
             <Eye size={16} />
           </button>
 
           <button
             onClick={() => onEdit(id)}
-            title="Edit task"
-            className="p-2 hover:bg-amber-50 rounded-md transition-colors text-amber-600 hover:text-amber-700"
+            className="p-2 hover:bg-amber-50 rounded-md text-amber-600"
           >
             <Edit2 size={16} />
           </button>
@@ -127,7 +127,7 @@ export default function TaskCard({
 
       {/* Footer */}
       <div className="flex gap-2 justify-between items-center pt-3 border-t border-primary/10">
-        {/* Priority + Points */}
+        {/* Priority */}
         <div className="flex gap-2">
           <span
             className={`text-xs font-bold px-2.5 py-1 rounded ${priorityColor.bg} ${priorityColor.text}`}
@@ -139,37 +139,38 @@ export default function TaskCard({
           </span>
         </div>
 
-        {/* More Actions - Move & Delete (Hover Visible) */}
+        {/* Actions */}
         {isHovered && (
           <div className="flex gap-1">
-            {/* MOVE */}
-            <div className="relative">
+            {/* ✅ MOVE FIXED */}
+            <div className="relative" ref={dropdownRef}>
               <button
-                onClick={() => setShowMoveMenu((prev) => !prev)}
-                title="Move task"
-                className="p-1.5 hover:bg-primary/10 rounded-md transition-colors text-primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMoveMenu((prev) => !prev);
+                }}
+                className="p-1.5 hover:bg-primary/10 rounded-md text-primary"
               >
                 <ArrowRightLeft size={14} />
               </button>
 
               {showMoveMenu && (
                 <div className="absolute bottom-full right-0 mb-2 w-32 bg-white border border-primary/10 rounded-lg shadow-lg z-[999]">
-                  {columns.map((col) => (
-                    <button
-                      key={col}
-                      onClick={() => {
-                        onMove(id, col);
-                        setShowMoveMenu(false);
-                      }}
-                      className={`block w-full text-left px-3 py-2 text-xs font-medium capitalize ${
-                        status === col
-                          ? "bg-accent/20 text-accent"
-                          : "hover:bg-primary/5 text-secondary"
-                      }`}
-                    >
-                      {col}
-                    </button>
-                  ))}
+                  {columns
+                    .filter((col) => col !== status) // 🔥 hide current
+                    .map((col) => (
+                      <button
+                        key={col}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onMove(id, col);
+                          setShowMoveMenu(false);
+                        }}
+                        className="block w-full text-left px-3 py-2 text-xs font-medium capitalize hover:bg-primary/5 text-secondary"
+                      >
+                        {col}
+                      </button>
+                    ))}
                 </div>
               )}
             </div>
@@ -177,8 +178,7 @@ export default function TaskCard({
             {/* DELETE */}
             <button
               onClick={() => onDelete(id)}
-              title="Delete task"
-              className="p-1.5 hover:bg-red-50 rounded-md transition-colors text-red-600 hover:text-red-700"
+              className="p-1.5 hover:bg-red-50 rounded-md text-red-600"
             >
               <Trash2 size={14} />
             </button>

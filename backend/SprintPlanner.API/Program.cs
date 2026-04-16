@@ -131,7 +131,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173","https://sprintplanner.inhawk.com")
+            policy.WithOrigins("http://localhost:5174","https://sprintplanner.inhawk.com")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
@@ -148,6 +148,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+app.UseRouting();
 
 app.UseCors("AllowFrontend");
 
