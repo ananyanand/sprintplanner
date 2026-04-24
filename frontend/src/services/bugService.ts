@@ -31,11 +31,9 @@ export const bugApi = {
   updateStatus: async (id: number, status: string) => {
     const res = await api.put(
       `/bugs/${id}/status`,
-      `"${status}"`, // 🔥 IMPORTANT (string body format for .NET)
+      JSON.stringify(status), // produces "fixing" — a valid JSON string
       {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        transformRequest: [(data: unknown) => data], // prevent Axios v1 from re-serializing the string
       }
     );
     return res.data;

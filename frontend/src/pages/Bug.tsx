@@ -14,6 +14,8 @@ import {
   Trash2,
   FolderPlus,
   ChevronDown,
+  Eye,
+  X,
 } from "lucide-react";
 import { createPortal } from "react-dom";
 import { useState, useEffect, useRef } from "react";
@@ -39,6 +41,7 @@ type BugType = {
 export default function BugPage() {
   const [bugs, setBugs] = useState<BugType[]>([]);
   const [open, setOpen] = useState(false);
+  const [viewBug, setViewBug] = useState<BugType | null>(null);
 
   const [projects, setProjects] = useState<any[]>([]);
   const [developers, setDevelopers] = useState<any[]>([]);
@@ -55,7 +58,7 @@ export default function BugPage() {
     projectId: 0,
   });
 
-  const columns = ["new", "open and assigned", "fixing", "retest", "closed"];
+  const columns = ["new", "assigned", "fixing", "retest", "closed"];
 
   // 🔥 CLOSE DROPDOWN ON OUTSIDE CLICK
   useEffect(() => {
@@ -96,27 +99,40 @@ export default function BugPage() {
     }
   };
 
+  // Restore last selected project from localStorage after projects load
+  useEffect(() => {
+    if (projects.length === 0 || selectedProject) return;
+    const saved = localStorage.getItem("bugPage_selectedProject");
+    if (!saved) return;
+    try {
+      const parsed = JSON.parse(saved);
+      const match = projects.find((p) => p.id === parsed.id);
+      if (match) {
+        setSelectedProject(match);
+        loadBugs(match.id);
+        loadProjectMembers(match.id);
+        setBug((prev) => ({ ...prev, projectId: match.id }));
+      }
+    } catch (err) {
+      console.error("Failed to restore project", err);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projects]);
+
   /* ===============================
      HANDLE PROJECT SELECTION
   =============================== */
   const handleProjectSelect = async (project: any) => {
     setSelectedProject(project);
     setProjectDropdownOpen(false);
+    localStorage.setItem("bugPage_selectedProject", JSON.stringify({ id: project.id, name: project.name }));
 
     if (!project.id) return;
 
     try {
-      // Load bugs for selected project
       await loadBugs(project.id);
-
-      // Load project members
       await loadProjectMembers(project.id);
-
-      // Update bug form
-      setBug((prev) => ({
-        ...prev,
-        projectId: project.id,
-      }));
+      setBug((prev) => ({ ...prev, projectId: project.id }));
     } catch (err) {
       console.error("Project load failed", err);
     }
@@ -172,12 +188,10 @@ export default function BugPage() {
      MOVE BUG (STATUS UPDATE)
   =============================== */
   const moveBug = async (bugId: number, newStatus: string) => {
+    setBugs((prev) =>
+      prev.map((b) => (b.id === bugId ? { ...b, status: newStatus } : b)),
+    );
     try {
-      // optimistic UI
-      setBugs((prev) =>
-        prev.map((b) => (b.id === bugId ? { ...b, status: newStatus } : b)),
-      );
-
       await bugApi.updateStatus(bugId, newStatus);
     } catch (err) {
       console.error(err);
@@ -262,20 +276,36 @@ export default function BugPage() {
     Critical: { bg: "bg-red-100", text: "text-red-700", icon: Zap },
   };
 
-  const statusColors: Record<
-    string,
-    { bg: string; text: string; label: string }
-  > = {
-    new: { bg: "bg-slate-100", text: "text-slate-700", label: "New" },
-    "open and assigned": {
-      bg: "bg-blue-100",
-      text: "text-blue-700",
-      label: "Assigned",
-    },
-    fixing: { bg: "bg-yellow-100", text: "text-yellow-700", label: "Fixing" },
-    retest: { bg: "bg-purple-100", text: "text-purple-700", label: "Retest" },
-    closed: { bg: "bg-green-100", text: "text-green-700", label: "Closed" },
-  };
+const statusColors: Record<
+  string,
+  { bg: string; text: string; label: string }
+> = {
+  new: {
+    bg: "bg-slate-100",
+    text: "text-slate-700",
+    label: "New",
+  },
+  assigned: {
+    bg: "bg-blue-100",
+    text: "text-blue-700",
+    label: "Assigned",
+  },
+  fixing: {
+    bg: "bg-yellow-100",
+    text: "text-yellow-700",
+    label: "Fixing",
+  },
+  retest: {
+    bg: "bg-purple-100",
+    text: "text-purple-700",
+    label: "Retest",
+  },
+  closed: {
+    bg: "bg-green-100",
+    text: "text-green-700",
+    label: "Closed",
+  },
+};
 
   return (
     <AppLayout>
@@ -498,6 +528,13 @@ export default function BugPage() {
 
                                   {/* Actions */}
                                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                      onClick={() => setViewBug(b)}
+                                      className="p-1.5 hover:bg-blue-50 rounded-lg transition"
+                                    >
+                                      <Eye size={13} className="text-blue-500" />
+                                    </button>
+
                                     <div className="relative group/move">
                                       <button className="p-1.5 hover:bg-slate-100 rounded-lg transition">
                                         <ArrowRightLeft size={13} className="text-secondary" />
@@ -606,6 +643,121 @@ export default function BugPage() {
             })}
           </div>
         )}
+
+        {/* 🔥 VIEW BUG MODAL */}
+        {viewBug &&
+          createPortal(
+            <div
+              className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-md p-4"
+              onClick={() => setViewBug(null)}
+            >
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-2xl bg-background/95 backdrop-blur-2xl border border-red-200 rounded-3xl shadow-2xl p-8 space-y-6"
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`h-12 w-1.5 rounded-full ${
+                        viewBug.severity === "Critical"
+                          ? "bg-gradient-to-b from-red-500 to-red-600"
+                          : viewBug.severity === "High"
+                          ? "bg-gradient-to-b from-orange-400 to-orange-500"
+                          : viewBug.severity === "Medium"
+                          ? "bg-gradient-to-b from-yellow-400 to-yellow-500"
+                          : "bg-gradient-to-b from-green-400 to-green-500"
+                      }`}
+                    />
+                    <div>
+                      <h2 className="text-xl font-bold text-primary leading-tight">
+                        {viewBug.title}
+                      </h2>
+                      {viewBug.projectName && (
+                        <div className="flex items-center gap-1 text-xs text-secondary mt-1">
+                          <FolderPlus size={11} />
+                          <span className="uppercase tracking-wide">{viewBug.projectName}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setViewBug(null)}
+                    className="p-2 hover:bg-slate-100 rounded-lg transition"
+                  >
+                    <X size={18} className="text-secondary" />
+                  </button>
+                </div>
+
+                {/* Badges */}
+                <div className="flex flex-wrap gap-3">
+                  {(() => {
+                    const sevColor = severityColors[viewBug.severity];
+                    const SevIcon = sevColor.icon;
+                    return (
+                      <span className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 ${sevColor.bg} ${sevColor.text}`}>
+                        <SevIcon size={12} />
+                        {viewBug.severity}
+                      </span>
+                    );
+                  })()}
+                  <span className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide ${statusColors[viewBug.status].bg} ${statusColors[viewBug.status].text}`}>
+                    {statusColors[viewBug.status].label}
+                  </span>
+                </div>
+
+                {/* Description */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-secondary uppercase tracking-wide">Description</p>
+                  <p className="text-sm text-primary bg-slate-50 rounded-xl p-4 leading-relaxed min-h-[60px]">
+                    {viewBug.description || <span className="italic text-secondary">No description provided.</span>}
+                  </p>
+                </div>
+
+                {/* Details grid */}
+                <div className="grid grid-cols-2 gap-6 border-t border-primary/10 pt-6">
+                  <div className="space-y-1">
+                    <p className="text-xs font-semibold text-secondary uppercase tracking-wide">Assigned To</p>
+                    {viewBug.assignee ? (
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-400 to-orange-400 flex items-center justify-center text-xs font-bold text-white shadow-sm">
+                          {viewBug.assignee.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
+                        </div>
+                        <span className="text-sm text-primary font-semibold">{viewBug.assignee}</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                          <AlertCircle size={14} className="text-secondary" />
+                        </div>
+                        <span className="text-sm text-secondary italic">Unassigned</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="text-xs font-semibold text-secondary uppercase tracking-wide">Due Date</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                        <Clock size={14} className="text-secondary" />
+                      </div>
+                      <span className="text-sm text-primary font-medium">
+                        {viewBug.dueDate
+                          ? new Date(viewBug.dueDate).toLocaleDateString("en-US", {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })
+                          : "No deadline"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )}
 
         {/* 🔥 MODAL */}
         {open &&

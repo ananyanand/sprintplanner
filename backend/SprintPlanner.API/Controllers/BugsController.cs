@@ -47,9 +47,14 @@ public class BugsController : ControllerBase
 
     // ✅ UPDATE STATUS ONLY
     [HttpPut("{id}/status")]
-    public async Task<IActionResult> UpdateStatus(int id, [FromBody] string status)
-    {
-        await _service.UpdateStatusAsync(id, status);
-        return NoContent();
-    }
+
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] string status)
+
+        {
+
+            await _service.UpdateStatusAsync(id, status);
+
+            return Ok();
+
+        }
 }

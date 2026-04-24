@@ -7,6 +7,7 @@ public interface IBugRepository
 
     Task AddAsync(Bug bug);
     Task UpdateAsync(Bug bug);
+    Task UpdateStatusDirectAsync(int id, string status);
     Task DeleteAsync(int id);
     Task<List<Bug>> GetByEmployeeAsync(int employeeId);
 }

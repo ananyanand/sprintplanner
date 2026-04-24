@@ -92,14 +92,7 @@ public class BugService : IBugService
 
     public async Task UpdateStatusAsync(int id, string status)
     {
-        var bug = await _repo.GetByIdAsync(id);
-
-        if (bug == null)
-            throw new Exception("Bug not found");
-
-        bug.Status = status;
-
-        await _repo.UpdateAsync(bug);
+        await _repo.UpdateStatusDirectAsync(id, status);
     }
 
     // ✅ UPDATE BUG (All Fields)

@@ -39,6 +39,13 @@ public class BugRepository : IBugRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task UpdateStatusDirectAsync(int id, string status)
+    {
+        await _context.Bugs
+            .Where(b => b.Id == id)
+            .ExecuteUpdateAsync(s => s.SetProperty(b => b.Status, status));
+    }
+
     public async Task DeleteAsync(int id)
     {
         var bug = await _context.Bugs.FindAsync(id);
